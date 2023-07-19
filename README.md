@@ -1,24 +1,24 @@
 # PyBrainage
 
-## PyBrainage Development
+## PyBrainage development
 
 Here we introduce PyBrainage (beta version) which is a Brain-age model designed to estimate age (brain-age) based on structural T1-weighted MRI brain scans. Below, you will find additional information about the model and instructions on running it with your preprocessed T1-weighted MRI data using FreeSurfer.
 
 BETA version: Your feedback/results using our model are most welcome. Please do get in touch.
 
-**The dataset**
+### Dataset
  
 The dataset used for training the model consisted of a sample size of N=58,836, covering a wide age range from 2 to 100 years. The sample included 51.1% female participants, with an average age of 46.9 years and a standard deviation of 24.4 years. The data was obtained from a healthy participant population across 82 different sites. For more in-depth information about the characteristics of this sample, please refer to the Rutherford et al 2022 study: [(https://elifesciences.org/articles/72904)] (Supplementary File 1 contains the complete sample description). Before running the model on your data, it may be worth checking if your sample overlaps with the training set as this is an important consideration when interpreting the results.
 
 
-**Model inputs and model training**
+### Model inputs and model training
 
 The model utilised neuroimaging features including cortical thickness and subcortical volumes based on the Destrieux atlas parcellations. These were extracted using FreeSurfer's aparcstats2table function with aparc.a2009s for both the left and right hemispheres and asegstats2table function to extract subcortical volumes, resulting in a total of 187 input features. The dataset was then divided into training and test sets using the train_test_split function from sklearn, with a test size of 0.2. Both training and test sets were standardized using the StandardScaler function.
 
 An Extra Trees regression was used to predict chronological age from the neuroimaging input features in the training set. This was achieved using the ExtraTreesRegressor function from sklearn.
 
 
-**Model testing and performance measures**
+### Model testing and performance measure
 
 After training, the model was evaluated using the testing set, which allowed us to assess its performance. The evaluation produced several performance measures, including a Mean Absolute Error (MAE) = 4.7 years, R-squared = .42 and a correlation coefficient, r = .66. 
  
