@@ -17,7 +17,7 @@ An Extra Trees regression was used to predict chronological age from the neuroim
 ### Model testing and performance measure
 After training, the model was evaluated using the testing set, which allowed us to assess its performance. The evaluation produced several performance measures, including a Mean Absolute Error (MAE) = 4.7 years, R-squared = .42 and a correlation coefficient, r = .66. 
  
-![Alt Text](https://github.com/biondof/PyBrainage/blob/main/pybrainage.png)
+![Alt Text](https://github.com/james-cole/PyBrainage/blob/main/pybrainage.png)
 
 
 ## How to use PyBrainage
