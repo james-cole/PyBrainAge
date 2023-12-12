@@ -1,6 +1,6 @@
-# PyBrainage
+# PyBrainAge
 
-## PyBrainage development
+## PyBrainAge development
 Here we introduce PyBrainage (beta version) which is a Brain-age model designed to estimate age (brain-age) based on structural T1-weighted MRI brain scans. Below, you will find additional information about the model and instructions on running it with your preprocessed T1-weighted MRI data using FreeSurfer.
 BETA version: Your feedback/results using our model are most welcome. Please do get in touch.
 
