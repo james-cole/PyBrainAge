@@ -58,8 +58,8 @@ conda env list
 ```
 You should observe an asterisk (*) next to "pybrainage_env," confirming that you are currently working within the "pybrainage_env" environment you have just created.
 
-**3 Run PyBrainAge using predict_v2.py**
-You can now proceed to run predict_v2.py (found on this github page).
+**3 Run PyBrainAge using predict.py**
+You can now proceed to run predict.py (found on this github page).
 The inputs required to this script are: 1) your ROIs.csv input file, 2) scaler.pkl (found on this github page) 3) ExtraTreesModel (downloaded via [Zenodo](https://zenodo.org/), using this link )
 The output is a PyBrainAge_Output.csv file containing ID, Age, Brain-Age and Brain-PAD (see note below) 
 
