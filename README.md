@@ -64,7 +64,7 @@ You should observe an asterisk (*) next to "pybrainage_env," confirming that you
 
 The script requires the following inputs:
 
-   1. Your `ROIs.csv` input file.
+   1.  Your `ROIs.csv` input file.
    2. `scaler.pkl` (available on this GitHub page).
    3. `ExtraTreesModel` (downloaded from [Zenodo](https://zenodo.org/)
 
