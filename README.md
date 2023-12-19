@@ -28,7 +28,7 @@ To extract brain-age estimates of your structural T1s using PyBrainAge, you will
 
 a. Extract the neuroimaging input features based on the Destrieux brain atlas, using Freesurfer (aparcstats2table with aparc.a2009s and asegstats2table). 
 
-b. Create a .csv file that contains 189 columns, with the first column being 'ID', the second column 'Age', and the remaining 187 neuroimaging features extracted from the previous step. The precise list of features can be found in `ROIS_input_template.txt` on this GitHub page. Please ensure that the order and naming of the columns match this template perfectly. We'll refer to this file as 'ROIs.csv.' Please note that Freesurfer uses 'and' instead of '&' in its naming convention, and 'Left-Thalamus-Proper' refers to the `Left-Thalamus`, while 'Right-Thalamus-Proper' refers to the `Right-Thalamus`.
+b. Create a .csv file that contains 189 columns, with the first column being 'ID', the second column 'Age', and the remaining 187 neuroimaging features extracted from the previous step. The precise list of features can be found in `ROIS_input_template.txt` on this GitHub page. Please ensure that the order and naming of the columns match this template perfectly. We'll refer to this file as 'ROIs.csv.' Please note that Freesurfer uses 'and' instead of '&' in its naming convention, and 'Left-Thalamus-Proper' refers to the 'Left-Thalamus', while 'Right-Thalamus-Proper' refers to the 'Right-Thalamus'.
 
 c. It is advisable to run QC of your neuroimaging data before and after Freesurfer preprocessing (see https://elifesciences.org/articles/72904 for suggestions).
 
