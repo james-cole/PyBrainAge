@@ -64,9 +64,9 @@ You should observe an asterisk (*) next to "pybrainage_env," confirming that you
 
 The script requires the following inputs:
 
-    Your ROIs.csv input file.
-    scaler.pkl (available on this GitHub page).
-    ExtraTreesModel (downloaded from [Zenodo](https://zenodo.org/) using this link).
+   1. Your `ROIs.csv` input file.
+   2. `scaler.pkl` (available on this GitHub page).
+   3. `ExtraTreesModel` (downloaded from [Zenodo](https://zenodo.org/)
 
 The output will be saved in a PyBrainAge_Output.csv file, containing ID, Age, Brain-Age, and Brain-PAD (refer to the note below for more details on Brain-PAD).
 
