@@ -28,9 +28,11 @@ To extract brain-age estimates of your structural T1s using PyBrainAge, you will
 
 a. Extract the neuroimaging input features based on the Destrieux brain atlas, using Freesurfer (aparcstats2table with aparc.a2009s and asegstats2table). 
 
-b. Create a .csv file that contains 189 columns, with the first column being 'ID', the second column 'Age', and the remaining 187 neuroimaging features extracted from the previous step. The precise list of features can be found in ROIS_input_template.txt on this GitHub page. Please ensure that the order and naming of the columns is a perfect match to this template. Let's refer to this file as "ROIs.csv".
+b. Create a .csv file that contains 189 columns, with the first column being 'ID', the second column 'Age', and the remaining 187 neuroimaging features extracted from the previous step. The precise list of features can be found in `ROIS_input_template.txt` on this GitHub page. Please ensure that the order and naming of the columns match this template perfectly. We'll refer to this file as 'ROIs.csv.' Please note that Freesurfer uses 'and' instead of '&' in its naming convention, and 'Left-Thalamus-Proper' refers to the Left Thalamus, while 'Right-Thalamus-Proper' refers to the Right Thalamus.
 
 c. It is advisable to run QC of your neuroimaging data before and after Freesurfer preprocessing (see https://elifesciences.org/articles/72904 for suggestions).
+
+d. Missing ROIs: Occasionally, Freesurfer may produce NaNs for certain ROIs. Pybrainage cannot process data with NaNs. To handle such cases without sacrificing them, you might consider imputing missing values for the affected ROIs. For example, you can use KNNImputer from the sklearn.impute module, especially when dealing with a small number of missing ROIs. 
 
 **Warning**: Do not use the PyBrainAge model if your input data includes UK Biobank data given this was used to train the model. Including UK Biobank data would comprimise the validity of your results.
 
@@ -59,9 +61,14 @@ conda env list
 You should observe an asterisk (*) next to "pybrainage_env," confirming that you are currently working within the "pybrainage_env" environment you have just created.
 
 **3 Run PyBrainAge using predict.py**
-You can now proceed to run predict.py (found on this github page).
-The inputs required to this script are: 1) your ROIs.csv input file, 2) scaler.pkl (found on this github page) 3) ExtraTreesModel (downloaded via [Zenodo](https://zenodo.org/), using this link )
-The output is a PyBrainAge_Output.csv file containing ID, Age, Brain-Age and Brain-PAD (see note below) 
+
+The script requires the following inputs:
+
+    Your ROIs.csv input file.
+    scaler.pkl (available on this GitHub page).
+    ExtraTreesModel (downloaded from [Zenodo](https://zenodo.org/) using this link).
+
+The output will be saved in a PyBrainAge_Output.csv file, containing ID, Age, Brain-Age, and Brain-PAD (refer to the note below for more details on Brain-PAD).
 
 
 ## Brain-PAD
