@@ -1,97 +1,147 @@
-# Load libraries
-import os
 import pandas as pd
-import numpy as np 
-import pickle 
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import pickle
 
+# Function to request file path from the user
+def get_file_path(prompt):
+    path = input(prompt)
+    while not os.path.isfile(path):
+        print("Invalid path. Please enter a valid path.")
+        path = input(prompt)
+    return path
 
-#load the model 
-model = pickle.load(open('ExtraTreesModel', 'rb'))
+# Request file paths from the user
+data_vol_path = get_file_path("Enter the path for the 'aseg_stats.txt' file: ")
+data_lh_path = get_file_path("Enter the path for the 'lh2009.aparc.thickness.txt' file: ")
+data_rh_path = get_file_path("Enter the path for the 'rh2009.aparc.thickness.txt' file: ")
+roi_template_path = get_file_path("Enter the path for the 'ROIS_input_template.txt' file: ")
+age_data_path = get_file_path("Enter the path for the 'Your_database.xlsx' file: ")
+model_path = get_file_path("Enter the path for the 'ExtraTreesModel' file: ")
+scaler_path = get_file_path("Enter the path for the 'scaler.pkl' file: ")
 
-#load the scaler
-sc_X = pickle.load(open('scaler.pkl', 'rb'))
+# Load data
+data_vol = pd.read_csv(data_vol_path, sep="\t")
+data_lh = pd.read_csv(data_lh_path, sep="\t")
+data_rh = pd.read_csv(data_rh_path, sep="\t")
 
-#read in the data
-df = pd.read_csv('ROIs.csv')   
+# Reset index
+data_vol.reset_index(drop=True, inplace=True)
+data_lh.reset_index(drop=True, inplace=True)
+data_rh.reset_index(drop=True, inplace=True)
 
-#get the subject IDs 
-IDs = df.iloc[:, 0] 
+# Concatenate data
+data_features = pd.concat([data_vol, data_lh, data_rh], axis=1)
+
+# Replace column names
+data_features.columns = data_features.columns.str.replace('_and_', '&')
+data_features.columns = data_features.columns.str.replace('Left-Thalamus', 'Left-Thalamus-Proper')
+data_features.columns = data_features.columns.str.replace('Right-Thalamus', 'Right-Thalamus-Proper')
+
+# Read and process ROIs input template
+with open(roi_template_path, 'r') as file:
+    data_rois = file.read().replace("\n", "\t")
+
+with open(roi_template_path, 'w') as writer:
+    writer.write(data_rois)
+
+data_rois = pd.read_csv(roi_template_path, sep="\t")
+data_total = pd.DataFrame(index=range(data_features.shape[0]), columns=data_rois.columns.tolist())
+
+# Populate data_total
+for i in range(0, len(data_rois.columns.tolist())):
+    if i > 1:
+        title = data_rois.columns.tolist()[i]
+        data_total[title] = data_features.filter(like=title, axis=1).iloc[:, 0]
+
+data_total['ID'] = data_features.filter(like='idx', axis=1).iloc[:, 0]
+
+# Load age data
+age = pd.read_excel(age_data_path)
+
+# Map ages to data_total
+array_ages = []
+for index, row in data_total.iterrows():
+    subject = row['ID']
+    selected_line = age[age['sub'] == str(subject[32:][:-8])]
+    selected_age = selected_line['age'].values[0] if not selected_line.empty else np.nan
+    array_ages.append(selected_age)
+
+data_total['Age'] = array_ages
+data_total = data_total.dropna()
+
+# Load model and scaler
+model = pickle.load(open(model_path, 'rb'))
+sc_X = pickle.load(open(scaler_path, 'rb'))
+
+# Prepare data for prediction
+df = data_total
+IDs = df.iloc[:, 0]
 Ages = df.iloc[:, 1]
+data = df.iloc[:, 2:]
 
-#remove the subject ID and age column 
-data = df.iloc[:, 2:]   
-
-# check for missing data
-if data.isnull().values.any() == True:
+# Validate data
+if data.isnull().values.any():
     raise ValueError('There is missing data in the dataframe')
-inf =  data.isin([np.inf, -np.inf])
 
-# check for infinite values in data
-if inf.values.sum() != 0: 
-    raise ValueError('There is an infinite value in your dataframe') 
+if data.isin([np.inf, -np.inf]).values.sum() != 0:
+    raise ValueError('There is an infinite value in your dataframe')
 
-# check for non-numeric data
 for index, row in enumerate(data.iterrows()):
     if any(isinstance(val, str) for val in row[1].values):
-        raise ValueError('There is non-numeric data in the dataframe') 
-    
+        raise ValueError('There is non-numeric data in the dataframe')
 
-# For the scaler to work (next step), the features names in 'data' need to match the ROI_input_template.txt format. 
-# However, some of the col names may be have been partially transformed to match the format used in Freesurfer. 
-# This function allows those changes to be reverted back to ROI_input_template.txt format.
+# Rename columns if needed
 def rename_cols_to_roi_format(data):
-
     new_columns = []
     for col in data.columns:
-        col = col.replace('_and_', '&')  # Replace '_and_' with '&'
-        col = col.replace('Left-Thalamus', 'Left-Thalamus-Proper')  # Replace 
-        col = col.replace('Right-Thalamus', 'Right-Thalamus-Proper')  # Replace 
+        col = col.replace('_and_', '&')
+        col = col.replace('Left-Thalamus', 'Left-Thalamus-Proper')
+        col = col.replace('Right-Thalamus', 'Right-Thalamus-Proper')
         new_columns.append(col)
-
-    # Assign the modified column names 
     data.columns = new_columns
     return data
 
-
-
-#apply the scaler transformation to the data 
+# Apply scaler
 try:
     data = sc_X.transform(data)
 except ValueError as e:
     print("Scaler failed potentially due to feature name mismatch, attempting to rename columns and attempt scaler again.")
-    data = rename_cols_to_roi_format(data)  # attempt renaming function
+    data = rename_cols_to_roi_format(data)
     try:
-        data = sc_X.transform(data) #attempt scaler again
+        data = sc_X.transform(data)
         print('Scaler transformation appears successful')
     except ValueError:
         raise ValueError('Failing to apply scaler to the data. Check if the scaler is loaded correctly and/or if the data is in the correct format.') from e
 
-
-# predict
+# Predict
 outputs = []
-
 try:
-    # predict Brain-age (apply ExtraTrees model to whole array at once)
     outputs = model.predict(data)
-    
 except:
-    print(f"Applying the model to the data at once failed. Moving to apply the model row-by-row (slower).")
-    # predict Brain-age row-by-row
+    print("Applying the model to the data at once failed. Moving to apply the model row-by-row (slower).")
     for row in range(len(data)):
         try:
-            outputs.append(model.predict(data[row].reshape(1, -1))) 
+            outputs.append(model.predict(data[row].reshape(1, -1)))
         except:
             raise ValueError(f'Failed at row {row}')
 print(f"Processed all {len(data)} rows successfully. Moving to save the results.")
 
-
+# Save results
 stacked = np.column_stack((IDs, Ages, outputs))
+df2 = pd.DataFrame(stacked, columns=['ID', 'Age', 'BrainAge'])
 
-# Convert to a pandas dataframe and add column name
-df2 = pd.DataFrame(stacked, columns=['ID', 'Age','BrainAge'])
+# Calculate Brain-PAD
+df2['BrainPAD'] = df2['BrainAge'] - df2['Age']
 
-# Calculate Brain-PAD (Predicted Age Difference)
-df2['BrainPAD']=df2['BrainAge']-df2['Age']
+# Save output
+output_path = input("Enter the path to save the 'PyBrainAge_Output.csv' file: ")
+df2.to_csv(output_path, index=False)
 
-#save the output
-df2.to_csv('PyBrainAge_Output.csv') #modify output filename/path as needed 
+# Plot results
+df2.plot(kind='scatter', x='Age', y='BrainAge')
+plt.plot([0, 100], [0, 100], color='g', label='cos')
+plt.xlim(30, 100)
+plt.ylim(30, 100)
+plt.show()
