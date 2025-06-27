@@ -34,7 +34,7 @@ c. It is advisable to run QC of your neuroimaging data before and after Freesurf
 
 d. Missing ROIs: Occasionally, Freesurfer may produce NaNs for certain ROIs. Pybrainage cannot process data with NaNs. To handle such cases without sacrificing them, you might consider imputing missing values for the affected ROIs. For example, you can use KNNImputer from the sklearn.impute module, especially when dealing with a small number of missing ROIs. 
 
-**Warning**: Do not use the PyBrainAge model if your input data includes UK Biobank data given this was used to train the model. Including UK Biobank data would comprimise the validity of your results.
+**Warning**: Do not use the PyBrainAge model if your input data includes UK Biobank data given this was used to train the model. Including UK Biobank data would comprimise the validity of your results. Please check the Rutherford paper (mentioned below) for the full list of training datasets to take into consideration.
 
 **2 Create a Conda Environment**
 
@@ -45,7 +45,7 @@ conda create  --name pybrainage_env python=3.7 scikit-learn=0.24.2 pandas=1.3.4 
 conda activate pybrainage_env 
 ```
 
-Here we are specifying precise versions of Python, scikit-learn, pandas, and numpy to operate within the isolated environment, ensuring it does not interfere with your other environments. This approach is essential to eliminate warning messages and potential errors caused by version conflicts, especially concerning scikit-learn.
+Here we are specifying precise versions of Python, scikit-learn, pandas, and numpy to operate within the isolated environment, ensuring it does not interfere with your other environments. This approach is essential to eliminate warning messages and potential errors caused by version conflicts, especially concerning scikit-learn. You won't be able to unpickle the model file unless you're using the correct scikit-learn version.
 
 However, please be aware that even with these configurations, you may encounter the following message. Please ignore!
 
